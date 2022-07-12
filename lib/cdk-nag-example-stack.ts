@@ -84,7 +84,7 @@ export class CdkNagExampleStack extends Stack {
 
     NagSuppressions.addResourceSuppressions(
       uploadBucket,
-      [{id:'AwsSolutions-S2', reason: 'This bucket is meant to be public'}]
+      [{id: 'AwsSolutions-S2', reason: 'This bucket is meant to be public'}]
     );
     const uploadHandler = new Function(this, 'UploadHandler', {
       runtime: Runtime.NODEJS_16_X,
