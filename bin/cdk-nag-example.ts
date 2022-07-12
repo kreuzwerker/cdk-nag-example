@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkNagExampleStack } from '../lib/cdk-nag-example-stack';
-import {Aspects} from "aws-cdk-lib";
-import {AwsSolutionsChecks, HIPAASecurityChecks} from "cdk-nag";
-import {NIST80053R4Checks} from "cdk-nag/lib/packs/nist-800-53-r4";
-import {NIST80053R5Checks} from "cdk-nag/lib/packs/nist-800-53-r5";
-import {PCIDSS321Checks} from "cdk-nag/lib/packs/pci-dss-321";
+import {CdkNagExampleStack} from '../lib/cdk-nag-example-stack';
+import {Aspects} from 'aws-cdk-lib';
+import {AwsSolutionsChecks, HIPAASecurityChecks} from 'cdk-nag';
+import {NIST80053R4Checks} from 'cdk-nag/lib/packs/nist-800-53-r4';
+import {NIST80053R5Checks} from 'cdk-nag/lib/packs/nist-800-53-r5';
+import {PCIDSS321Checks} from 'cdk-nag/lib/packs/pci-dss-321';
 
 const app = new cdk.App();
 new CdkNagExampleStack(app, 'CdkNagExampleStack', {});
