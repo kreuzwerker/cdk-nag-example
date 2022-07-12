@@ -12,8 +12,38 @@ export class CdkNagExampleStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const uploadQueue = new Queue(this, 'UploadQueue');
-    const uploadTopic = new Topic(this, 'UploadTopic');
+
+    const uploadQueue = new Queue(this, "UploadQueue", {
+      encryption: QueueEncryption.KMS_MANAGED,
+      deadLetterQueue: {
+        maxReceiveCount: 5,
+        queue: new Queue(this,"UploadDLQ", {
+          encryption: QueueEncryption.KMS_MANAGED
+        })
+      }
+    });
+
+    const enforceTlsStatement = new PolicyStatement({
+      sid: "Enforce TLS for all principals",
+      effect: iam.Effect.DENY,
+      principals: [
+        new iam.AnyPrincipal(),
+      ],
+      actions: [
+        "sqs:*",
+        "sns:publish"
+      ],
+      conditions: {
+        "Bool": {"aws:SecureTransport": false},
+      },
+    }  );
+    uploadQueue.addToResourcePolicy(enforceTlsStatement);
+    uploadQueue.deadLetterQueue?.queue.addToResourcePolicy(enforceTlsStatement);
+
+    const uploadTopic = new Topic(this, "UploadTopic", {
+      masterKey: Alias.fromAliasName(this, "SnsKey", "aws/sns")
+    });
+
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
     const uploadBucket = new Bucket(this, 'UploadBucket', {
@@ -22,11 +52,11 @@ export class CdkNagExampleStack extends Stack {
     uploadBucket.addEventNotification(
       EventType.OBJECT_CREATED, new SnsDestination(uploadTopic),
     );
-    const uploadHandler = new Function(this, 'UploadHandler', {
+    const uploadHandler = new Function(this, "UploadHandler", {
       runtime: Runtime.NODEJS_16_X,
       code: Code.fromInline(`
         exports.handler = async (event) => {
-          console.log('event: ', event)
+          console.log("event: ", event)
         };
       `),
       handler: 'index.handler',
