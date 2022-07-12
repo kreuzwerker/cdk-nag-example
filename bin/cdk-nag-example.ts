@@ -17,6 +17,6 @@ Aspects.of(app).add(new AwsSolutionsChecks({verbose: true, logIgnores: true}));
 //Aspects.of(app).add(new NIST80053R5Checks({verbose:true, logIgnores: true}));
 //Aspects.of(app).add(new PCIDSS321Checks({verbose:true, logIgnores: true}));
 NagSuppressions.addStackSuppressions(stack, [
-  {id: 'AwsSolutions-IAM4', reason: 'We prefer the AWS managed policies'},
-  {id: 'AwsSolutions-IAM5', reason: 'We prefer the AWS managed roles'},
+  { id: 'AwsSolutions-IAM4', reason: 'We prefer the AWS managed policies' },
+  { id: 'AwsSolutions-IAM5', reason: 'We prefer the AWS managed roles' },
 ]);
