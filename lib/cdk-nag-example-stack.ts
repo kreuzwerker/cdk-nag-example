@@ -68,7 +68,7 @@ export class CdkNagExampleStack extends Stack {
     uploadBucket.addEventNotification(
       EventType.OBJECT_CREATED, new SnsDestination(uploadTopic),
     );
-    const uploadHandler = new Function(this, "UploadHandler", {
+    const uploadHandler = new Function(this, 'UploadHandler', {
       runtime: Runtime.NODEJS_16_X,
       code: Code.fromInline(`
         exports.handler = async (event) => {
