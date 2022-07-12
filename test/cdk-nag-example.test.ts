@@ -7,7 +7,7 @@ import * as CdkNagExample from '../lib/cdk-nag-example-stack';
 let app: cdk.App, stack: cdk.Stack, template: cdk.assertions.Template;
 beforeEach(() => {
   app = new cdk.App();
-  stack = new CdkNagExample.CdkNagExampleStack(app, "Stack2Test");
+  stack = new CdkNagExample.CdkNagExampleStack(app, 'Stack2Test');
   template = Template.fromStack(stack);
 });
 describe('the stack', () => {
@@ -20,4 +20,4 @@ describe('the stack', () => {
   it('has a S3 Bucket', () => {
     template.hasResource('AWS::S3::Bucket', {});
   });
-})
+});
