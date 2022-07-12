@@ -90,7 +90,7 @@ export class CdkNagExampleStack extends Stack {
       runtime: Runtime.NODEJS_16_X,
       code: Code.fromInline(`
         exports.handler = async (event) => {
-          console.log("event: ", event)
+          console.log('event: ', event)
         };
       `),
       handler: 'index.handler',
