@@ -13,8 +13,8 @@ export class CdkNagExampleStack extends Stack {
     super(scope, id, props);
 
     const uploadQueue = new Queue(this, 'UploadQueue');
-    const sqsSubscription = new SqsSubscription(uploadQueue);
     const uploadTopic = new Topic(this, 'UploadTopic');
+    const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
     const uploadBucket = new Bucket(this, "UploadBucket");
     uploadBucket.addEventNotification(
