@@ -68,6 +68,8 @@ export class CdkNagExampleStack extends Stack {
 
 
 
+
+
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
 
