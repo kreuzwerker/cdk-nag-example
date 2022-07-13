@@ -55,16 +55,10 @@ export class CdkNagExampleStack extends Stack {
     const uploadBucket = new Bucket(this, 'UploadBucket', {
       accessControl: BucketAccessControl.PUBLIC_READ_WRITE,
       serverAccessLogsPrefix: 'logs/',
-      encryption: BucketEncryption.S3_MANAGED
+      encryption: BucketEncryption.S3_MANAGED,
+      enforceSSL: true
     });
 
-    enforceTlsStatement.addResources(
-      uploadBucket.bucketArn,
-      uploadBucket.arnForObjects('*')
-    );
-
-    enforceTlsStatement.addActions('s3:*');
-    uploadBucket.addToResourcePolicy(enforceTlsStatement);
     uploadBucket.addEventNotification(
       EventType.OBJECT_CREATED, new SnsDestination(uploadTopic),
     );
