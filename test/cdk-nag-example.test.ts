@@ -1,6 +1,8 @@
 import * as cdk from 'aws-cdk-lib';
-import {Template} from 'aws-cdk-lib/assertions';
+import {Annotations, Match, Template} from 'aws-cdk-lib/assertions';
 import * as CdkNagExample from '../lib/cdk-nag-example-stack';
+import {Aspects} from 'aws-cdk-lib';
+import {AwsSolutionsChecks} from 'cdk-nag';
 
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/cdk-nag-example-stack.ts
@@ -9,6 +11,25 @@ beforeEach(() => {
   app = new cdk.App();
   stack = new CdkNagExample.CdkNagExampleStack(app, 'Stack2Test');
   template = Template.fromStack(stack);
+  Aspects.of(stack).add(new AwsSolutionsChecks());
+
+});
+describe('Compliance', () => {
+  test('has no unsuppressed Warnings', () => {
+    const warnings = Annotations.fromStack(stack).findWarning(
+      '*',
+      Match.stringLikeRegexp('AwsSolutions-.*')
+    );
+    expect(warnings).toHaveLength(0);
+  });
+
+  test('has no unsuppressed Errors', () => {
+    const errors = Annotations.fromStack(stack).findError(
+      '*',
+      Match.stringLikeRegexp('AwsSolutions-.*')
+    );
+    expect(errors).toHaveLength(0);
+  });
 });
 describe('the stack', () => {
   it('has a SQS Queue', () => {
