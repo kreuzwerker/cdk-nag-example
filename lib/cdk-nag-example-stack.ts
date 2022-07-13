@@ -22,6 +22,9 @@ export class CdkNagExampleStack extends Stack {
     });
     sqsKey.grant(new ServicePrincipal(ServicePrincipal.servicePrincipalName('s3.amazonaws.com')), 'kms:Decrypt', 'kms:GenerateDataKey*');
 
+    const dlq = new Queue(this, 'UploadDLQ', {
+      encryption: QueueEncryption.KMS_MANAGED
+    });
     const uploadQueue = new Queue(this, 'UploadQueue', {
       encryption: QueueEncryption.KMS,
       encryptionMasterKey: sqsKey,

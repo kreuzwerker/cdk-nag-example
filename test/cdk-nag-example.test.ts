@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import {Annotations, Match, Template} from 'aws-cdk-lib/assertions';
 import * as CdkNagExample from '../lib/cdk-nag-example-stack';
 import {Aspects} from 'aws-cdk-lib';
-import {AwsSolutionsChecks} from 'cdk-nag';
+import {AwsSolutionsChecks, NagSuppressions} from 'cdk-nag';
 
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/cdk-nag-example-stack.ts
@@ -12,6 +12,12 @@ beforeEach(() => {
   stack = new CdkNagExample.CdkNagExampleStack(app, 'Stack2Test');
   template = Template.fromStack(stack);
   Aspects.of(stack).add(new AwsSolutionsChecks());
+  NagSuppressions.addStackSuppressions(stack, [
+  {id: 'AwsSolutions-IAM4', reason: 'We prefer the AWS managed policies'},
+  {id: 'AwsSolutions-IAM5', reason: 'We prefer the AWS managed roles'},
+]);
+
+
 
 });
 describe('Compliance', () => {
