@@ -36,9 +36,9 @@ export class CdkNagExampleStack extends Stack {
         })
       }
     });
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/CdkNagExampleStack/UploadDLQ/Resource', [
+    NagSuppressions.addResourceSuppressions(
+      dlq,
+       [
         {
           id: 'AwsSolutions-SQS3',
           reason: 'this IS a deadletter queue'
