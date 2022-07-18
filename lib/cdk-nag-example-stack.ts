@@ -2,7 +2,7 @@ import {Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {Queue} from 'aws-cdk-lib/aws-sqs';
 import {SnsDestination} from 'aws-cdk-lib/aws-s3-notifications';
-import {Bucket, EventType} from 'aws-cdk-lib/aws-s3';
+import {Bucket, BucketAccessControl, EventType} from 'aws-cdk-lib/aws-s3';
 import {SqsSubscription} from 'aws-cdk-lib/aws-sns-subscriptions';
 import {Topic} from 'aws-cdk-lib/aws-sns';
 import {Code, Function, Runtime} from 'aws-cdk-lib/aws-lambda';
@@ -16,7 +16,9 @@ export class CdkNagExampleStack extends Stack {
     const uploadTopic = new Topic(this, 'UploadTopic');
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
-    const uploadBucket = new Bucket(this, 'UploadBucket');
+    const uploadBucket = new Bucket(this, 'UploadBucket', {
+      accessControl: BucketAccessControl.PUBLIC_READ_WRITE,
+    });
     uploadBucket.addEventNotification(
       EventType.OBJECT_CREATED, new SnsDestination(uploadTopic),
     );
