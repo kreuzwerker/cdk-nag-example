@@ -23,22 +23,20 @@ export class CdkNagExampleStack extends Stack {
     sqsKey.grant(new ServicePrincipal(ServicePrincipal.servicePrincipalName('s3.amazonaws.com')), 'kms:Decrypt', 'kms:GenerateDataKey*');
 
     const dlq = new Queue(this, 'UploadDLQ', {
-      encryption: QueueEncryption.KMS_MANAGED
+      encryption: QueueEncryption.KMS,
+      encryptionMasterKey: sqsKey
     });
     const uploadQueue = new Queue(this, 'UploadQueue', {
       encryption: QueueEncryption.KMS,
       encryptionMasterKey: sqsKey,
       deadLetterQueue: {
         maxReceiveCount: 5,
-        queue: new Queue(this, 'UploadDLQ', {
-          encryption: QueueEncryption.KMS,
-          encryptionMasterKey: sqsKey
-        })
+        queue: dlq,
       }
     });
     NagSuppressions.addResourceSuppressions(
       dlq,
-       [
+      [
         {
           id: 'AwsSolutions-SQS3',
           reason: 'this IS a deadletter queue'
@@ -68,8 +66,6 @@ export class CdkNagExampleStack extends Stack {
     uploadQueue.deadLetterQueue!.queue.addToResourcePolicy(enforceTlsStatement.copy({
       resources: [uploadQueue.deadLetterQueue!.queue.queueArn]
     }));
-
-
 
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
