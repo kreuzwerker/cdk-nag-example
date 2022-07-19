@@ -16,7 +16,8 @@ export class CdkNagExampleStack extends Stack {
     super(scope, id, props);
 
     const sqsKey = new Key(this, 'SQSKey', {
-      removalPolicy: RemovalPolicy.DESTROY
+      removalPolicy: RemovalPolicy.DESTROY,
+      enableKeyRotation: true,
     });
     sqsKey.grant(new ServicePrincipal(ServicePrincipal.servicePrincipalName('s3.amazonaws.com')), 'kms:Decrypt', 'kms:GenerateDataKey*');
 
