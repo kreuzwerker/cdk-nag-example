@@ -2,7 +2,7 @@ import {Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {Queue, QueueEncryption} from 'aws-cdk-lib/aws-sqs';
 import {SnsDestination} from 'aws-cdk-lib/aws-s3-notifications';
-import {Bucket,BucketAccessControl, BucketEncryption, EventType} from 'aws-cdk-lib/aws-s3';
+import {Bucket, BucketAccessControl, BucketEncryption, EventType} from 'aws-cdk-lib/aws-s3';
 import {SqsSubscription} from 'aws-cdk-lib/aws-sns-subscriptions';
 import {Topic} from 'aws-cdk-lib/aws-sns';
 import {Code, Function, Runtime} from 'aws-cdk-lib/aws-lambda';
@@ -38,15 +38,15 @@ export class CdkNagExampleStack extends Stack {
       conditions: {
         'Bool': {'aws:SecureTransport': false},
       },
+      actions: ['sqs:*'],
     });
 
-    enforceTlsStatement.addResources(
-      uploadQueue.queueArn,
-      uploadQueue.deadLetterQueue!.queue.queueArn
-    );
-    enforceTlsStatement.addActions('sqs:*');
-    uploadQueue.addToResourcePolicy(enforceTlsStatement);
-    uploadQueue.deadLetterQueue!.queue.addToResourcePolicy(enforceTlsStatement);
+    uploadQueue.addToResourcePolicy(enforceTlsStatement.copy({
+      resources: [uploadQueue.queueArn]
+    }));
+    uploadQueue.deadLetterQueue!.queue.addToResourcePolicy(enforceTlsStatement.copy({
+      resources: [uploadQueue.deadLetterQueue!.queue.queueArn]
+    }));
 
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
