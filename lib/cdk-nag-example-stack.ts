@@ -22,20 +22,21 @@ export class CdkNagExampleStack extends Stack {
     });
     sqsKey.grant(new ServicePrincipal(ServicePrincipal.servicePrincipalName('s3.amazonaws.com')), 'kms:Decrypt', 'kms:GenerateDataKey*');
 
+    const dlq = new Queue(this, 'UploadDLQ', {
+      encryption: QueueEncryption.KMS,
+      encryptionMasterKey: sqsKey
+    });
     const uploadQueue = new Queue(this, 'UploadQueue', {
       encryption: QueueEncryption.KMS,
       encryptionMasterKey: sqsKey,
       deadLetterQueue: {
         maxReceiveCount: 5,
-        queue: new Queue(this, 'UploadDLQ', {
-          encryption: QueueEncryption.KMS,
-          encryptionMasterKey: sqsKey
-        })
+        queue: dlq,
       }
     });
-    NagSuppressions.addResourceSuppressionsByPath(
-      this,
-      '/CdkNagExampleStack/UploadDLQ/Resource', [
+    NagSuppressions.addResourceSuppressions(
+      dlq,
+      [
         {
           id: 'AwsSolutions-SQS3',
           reason: 'this IS a deadletter queue'
@@ -66,8 +67,6 @@ export class CdkNagExampleStack extends Stack {
       resources: [uploadQueue.deadLetterQueue!.queue.queueArn]
     }));
 
-
-
     const sqsSubscription = new SqsSubscription(uploadQueue);
     uploadTopic.addSubscription(sqsSubscription);
 
@@ -90,7 +89,7 @@ export class CdkNagExampleStack extends Stack {
       runtime: Runtime.NODEJS_16_X,
       code: Code.fromInline(`
         exports.handler = async (event) => {
-          console.log("event: ", event)
+          console.log('event: ', event)
         };
       `),
       handler: 'index.handler',
